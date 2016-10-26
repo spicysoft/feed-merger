@@ -6,7 +6,7 @@ Description: Merge feeds of other wordpresses
 Version: 0.0
 Author: Motoyasu, Yamada
 Author URI: m_yamada@spicysoft.com
-License: Now only in private, but avilabe to open.
+License: Apache License Version 2.0
 */
 require_once __DIR__ . '/FeedMerger.php';
 require_once __DIR__ . '/config.php';
