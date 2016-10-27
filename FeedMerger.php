@@ -3,10 +3,10 @@ require_once __DIR__  . '/SimpleXMLElement2.php';
 
 function mergeFeeds($urls)
 {
-  $xmls = [];
-  $namespaces = [];
-  $sort = [];
-  $entries = [];
+  $xmls = array();
+  $namespaces = array();
+  $sort = array();
+  $entries = array();
 
   for ($i = 0; $i < count($urls); $i++) {
     $url = $urls[$i];
