@@ -10,7 +10,7 @@ function config()
     'urls' => array
     (
       "http://vrinside.jp/feed/",
-      "http://bank.vrinside.jp/feed/"
+      "http://bank.vrinside.jp/new_review/feed/"
     )
   );
 }
