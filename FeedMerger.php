@@ -33,7 +33,8 @@ function mergeFeeds($urls)
   $channel = $output->addChild('channel');
 
   $xml = $xmls[0];
-  $src_channel = $xml->xpath('channel')[0];
+  $tmp = $xml->xpath('channel');
+  $src_channel = $tmp[0];
   $channel->copyFrom($src_channel, array('item', 'generator'));
 
   foreach($entries as $e) {
