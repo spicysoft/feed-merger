@@ -53,6 +53,7 @@ class ss_feed_merger_plugin
     header('Content-Type: text/xml; charset=utf-8');
     header('Content-Length:' . strlen($xml));
     echo $xml;
+    exit;
   }
 }
 
