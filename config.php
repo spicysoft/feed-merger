@@ -9,7 +9,7 @@ function config()
 
     'urls' => array
     (
-      "http://vrinside.jp/feed/",
+      "http://vrinside.jp/news/?feed=smartnews",
       "http://bank.vrinside.jp/new_review/feed/"
     )
   );
