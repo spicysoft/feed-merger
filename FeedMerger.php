@@ -30,11 +30,12 @@ function mergeFeeds($urls)
   }
 
   $output = new \SimpleXMLElement2('<?xml version="1.0" encoding="UTF-8"?>'. "\n" .'<rss version="2.0" xmlns="http://purl.org/rss/1.0/"' . $attributes . '></rss>');
-  $channel = $output->addChild('channel');
 
   $xml = $xmls[0];
   $tmp = $xml->xpath('channel');
   $src_channel = $tmp[0];
+
+  $channel = $output->addChild('channel');  
   $channel->copyFrom($src_channel, array('item', 'generator'));
 
   foreach($entries as $e) {

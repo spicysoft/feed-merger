@@ -2,6 +2,7 @@
 
 class SimpleXMLElement2 extends \SimpleXMLElement 
 {
+  const NAMESPACE_RSS = 'http://purl.org/rss/1.0/';
   private static $CDATAEncoding = array('description', 'content:encoded', 'summary', 'dc:creator', 'category', 'snf:analytics', 'snf:advertisement');
 
   /**
@@ -53,46 +54,59 @@ class SimpleXMLElement2 extends \SimpleXMLElement
     $encoding = in_array($tagName, self::$CDATAEncoding);
 
     if ($encoding) {
-      return $this->addChildWithCData($name, $data, $namespace);
+      return $this->addChildWithCData($name, $data, $namespace == null ? self::NAMESPACE_RSS : $namespace);
     } else {
-      return $this->addChild($name, $data, $namespace);
+      return $this->addChild($name, $data, $namespace == null ? self::NAMESPACE_RSS : $namespace);
     }     
+  }
+
+  private function hasChildren($namespaces, $element)
+  {
+    if (count($element->children()) != 0 )  {
+      return true;
+    }
+    foreach($namespaces as $n => $u) {
+      if (count($element->children($n, true)) != 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private function copyChild($k, $v, $namespace, $namespace_key, $namespaces, $excludeChildren)
+  {
+    $tagName = $namespace == null ? $k : $n . ':' . $k;
+    if (in_array($tagName, $excludeChildren)) {
+      return;
+    }
+    if ($this->hasChildren($namespaces, $v)) {
+      $add = $this->addChild($k, null, $namespace == null ? self::NAMESPACE_RSS : $namespace);
+      $add->copyFrom($v, $excludeChildren);
+    } else {
+      $add = $this->addChildOrCData($k, $v, $namespace, $namespace_key);
+    }    
   }
 
   public function copyFrom($src, $excludeChildren = array())
   {
-    $namespaces = $this->getDocNamespaces();    
+    $namespaces = $src->getDocNamespaces();   
+
+    foreach ($src->attributes() as $an => $av) {
+      $this->addAttribute($an, $av);
+    }
+    foreach($namespaces as $n => $u) {
+      foreach ($src->attributes($u, true) as $an => $av) {
+        $this->addAttribute($an, $av, $u);
+      }      
+    }
+
     foreach ($src->children() as $k => $v) {
-      if (!in_array($k, $excludeChildren)) {    
-        if ($v->count() != 0) {
-          $add = $this->addChild($k);
-          $add->copyFrom($v,$excludeChildren);
-        } else {
-          $add = $this->addChildOrCData($k, $v);
-        }
-        foreach ($v->attributes() as $an => $av) {
-          $add->addAttribute($an, $av);
-        }
-      }
+      $this->copyChild($k, $v, null, null, $namespaces, $excludeChildren);
     }
 
     foreach($namespaces as $n => $u) {
-      if ($n == '') {
-        continue;
-      }
-      foreach($src->children($n, true) as $k=> $v) {
-        $tagName = $n . ':' . $k;
-        if (!in_array($tagName, $excludeChildren)) {
-          if ($v->count() != 0) {
-            $add = $this->addChild($k, null, $u); 
-            $add->copyFrom($v, $excludeChildren);
-          } else {
-            $add = $this->addChildOrCData($k, $v, $u, $n); 
-          }
-          foreach ($v->attributes() as $an => $av) {
-            $add->addAttribute($an, $av);
-          }      
-        }
+      foreach($src->children($u, false) as $k=> $v) {
+        $this->copyChild($k, $v, $u, $n, $namespaces, $excludeChildren);
       }
     }
   }
