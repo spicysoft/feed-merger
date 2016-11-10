@@ -47,11 +47,15 @@ class SimpleXMLElement2 extends \SimpleXMLElement
       return $filename !== null ? (bool)file_put_contents($filename, $data) : $data;
   }
 
+  public static function needCData($data)
+  {
+    return preg_match('/[<>&"\']/', $data);
+  }
 
   public function addChildOrCData($name, $data, $namespace = null, $namespace_key = null)
   {
     $tagName = $namespace_key != null ? $namespace_key. ':' . $name : $name;
-    $encoding = in_array($tagName, self::$CDATAEncoding);
+    $encoding = in_array($tagName, self::$CDATAEncoding) || self::needCData($data);
 
     if ($encoding) {
       return $this->addChildWithCData($name, $data, $namespace == null ? self::NAMESPACE_RSS : $namespace);
@@ -75,7 +79,8 @@ class SimpleXMLElement2 extends \SimpleXMLElement
 
   private function copyChild($k, $v, $namespace, $namespace_key, $namespaces, $excludeChildren)
   {
-    $tagName = $namespace == null ? $k : $n . ':' . $k;
+    $tagName = $namespace == null ? $k : $namespace_key . ':' . $k;
+
     if (in_array($tagName, $excludeChildren)) {
       return;
     }
